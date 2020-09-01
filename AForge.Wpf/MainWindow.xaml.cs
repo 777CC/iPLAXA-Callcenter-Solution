@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using Common;
@@ -23,6 +15,7 @@ using Common.Models;
 using CommonUI;
 using CommonUI.ViewModels;
 using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
 
 namespace AForge.Wpf
 {
@@ -51,6 +44,8 @@ namespace AForge.Wpf
         private IVideoSource _videoSource;
         #endregion
 
+        BitmapImage webcamImage = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -64,6 +59,7 @@ namespace AForge.Wpf
         {
             //UriBuilder address = new UriBuilder(IPAddress.Text);
             UriBuilder address = new UriBuilder("https://localhost:5001");
+            //UriBuilder address = new UriBuilder("https://bacom.dyndns.org:5001");
             //address.Path = path;
             return address.Uri;
         }
@@ -107,10 +103,58 @@ namespace AForge.Wpf
             await connection.StartAsync();
             Console.WriteLine(connection.State);
 
+            DesktopClient client = new DesktopClient(connection);
+            var list = await client.GetEventTypeList();
+            //EventLog log = new EventLog
+            //{
+            //    Type = list.Where(i => i.Name == "CaptureWebcam").FirstOrDefault()
+            //};
 
+            //SubsystemEvent subsystemEvent = new SubsystemEvent
+            //{
+            //    Name
+            //}
+
+            //Console.WriteLine(JsonConvert.SerializeObject(log));
+
+            while (true)
+            {
+                await Task.Delay(1000);
+                if (webcamImage != null)
+                {
+                    var testresult = await client.GetEventFromSubsystemAsync(3, 0, "CaptureWebcam", ImageToBase64(webcamImage));
+                    Console.WriteLine(testresult);
+                }
+            }
         }
 
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        public string ImageToBase64(BitmapImage image)
+        {
+            //string path = "D:\\SampleImage.jpg";
+            //using (Image image = Image.FromFile(path))
+            //{
+                    byte[] imageBytes = ImageToByte(image);
+                    var base64String = Convert.ToBase64String(imageBytes);
+                    return base64String;
+            //}
+        }
+
+        public Byte[] ImageToByte(BitmapImage imageSource)
+        {
+            Stream stream = imageSource.StreamSource;
+            Byte[] buffer = null;
+            if (stream != null && stream.Length > 0)
+            {
+                using (BinaryReader br = new BinaryReader(stream))
+                {
+                    buffer = br.ReadBytes((Int32)stream.Length);
+                }
+            }
+
+            return buffer;
+        }
+
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
             StopCamera();
         }
@@ -120,7 +164,7 @@ namespace AForge.Wpf
             StartCamera();
         }
 
-        private void video_NewFrame(object sender, Video.NewFrameEventArgs eventArgs)
+        private void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             try
             {
@@ -130,7 +174,10 @@ namespace AForge.Wpf
                     bi = bitmap.ToBitmapImage();
                 }
                 bi.Freeze(); // avoid cross thread operations and prevents leaks
-                Dispatcher.BeginInvoke(new ThreadStart(delegate { videoPlayer.Source = bi; }));
+                Dispatcher.BeginInvoke(new ThreadStart(delegate { 
+                    videoPlayer.Source = bi;
+                    webcamImage = bi;
+                }));
             }
             catch (Exception exc)
             {
