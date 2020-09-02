@@ -58,8 +58,8 @@ namespace AForge.Wpf
         private Uri GetServerUri()
         {
             //UriBuilder address = new UriBuilder(IPAddress.Text);
-            UriBuilder address = new UriBuilder("https://localhost:5001");
-            //UriBuilder address = new UriBuilder("https://bacom.dyndns.org:5001");
+            //UriBuilder address = new UriBuilder("https://localhost:5001");
+            UriBuilder address = new UriBuilder("https://bacom.dyndns.org:5001");
             //address.Path = path;
             return address.Uri;
         }
@@ -119,10 +119,10 @@ namespace AForge.Wpf
 
             while (true)
             {
-                await Task.Delay(1000);
+                await Task.Delay(5000);
                 if (webcamImage != null)
                 {
-                    var testresult = await client.GetEventFromSubsystemAsync(3, 0, "CaptureWebcam", ImageToBase64(webcamImage));
+                    var testresult = await client.GetEventFromSubsystemAsync(13, 0, "CaptureWebcam", ImageToBase64(webcamImage));
                     Console.WriteLine(testresult);
                 }
             }
@@ -141,16 +141,25 @@ namespace AForge.Wpf
 
         public Byte[] ImageToByte(BitmapImage imageSource)
         {
-            Stream stream = imageSource.StreamSource;
-            Byte[] buffer = null;
-            if (stream != null && stream.Length > 0)
-            {
-                using (BinaryReader br = new BinaryReader(stream))
-                {
-                    buffer = br.ReadBytes((Int32)stream.Length);
-                }
-            }
+            //Stream stream = imageSource.StreamSource;
+            //Byte[] buffer = null;
+            //if (stream != null && stream.Length > 0)
+            //{
+            //    using (BinaryReader br = new BinaryReader(stream))
+            //    {
+            //        buffer = br.ReadBytes((Int32)stream.Length);
+            //    }
+            //}
 
+
+            BitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(imageSource));
+            Byte[] buffer = null;
+            using (var mem = new MemoryStream())
+            {
+                encoder.Save(mem);
+                buffer = mem.ToArray();
+            }
             return buffer;
         }
 
