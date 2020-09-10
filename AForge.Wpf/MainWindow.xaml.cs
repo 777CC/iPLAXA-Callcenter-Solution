@@ -45,7 +45,7 @@ namespace AForge.Wpf
         #endregion
 
         BitmapImage webcamImage = null;
-
+        int accountUser = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -53,12 +53,13 @@ namespace AForge.Wpf
             GetVideoDevices();
             this.Closing += MainWindow_Closing;
 
-            OnLoginClickAsync();
+            //OnLoginClickAsync();
         }
         private Uri GetServerUri()
         {
             //UriBuilder address = new UriBuilder(IPAddress.Text);
             //UriBuilder address = new UriBuilder("https://localhost:5001");
+            //UriBuilder address = new UriBuilder("https://192.168.1.105:5001");
             UriBuilder address = new UriBuilder("https://bacom.dyndns.org:5001");
             //address.Path = path;
             return address.Uri;
@@ -77,18 +78,18 @@ namespace AForge.Wpf
         void LoginSuccessCallback(Account account)
         {
             AppUser.CurrentAccount = new AccountViewModel(account, null);
-
+            accountUser = account.Id;
             MessageBox.Show("Login Success");
-            ConnectAlarm(GetServerUri()).GetAwaiter();
+            ConnectAlarm(GetServerUri(), account.Id).GetAwaiter();
         }
         void LoginFailure(string result)
         {
             MessageBox.Show(result, "Login Failure", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        public async Task ConnectAlarm(Uri uri)
+        public async Task ConnectAlarm(Uri uri,int accountId)
         {
-
+            accountUser = accountId;
             //Console.WriteLine(uri);
             //string p = uri.AbsoluteUri.Replace(uri.LocalPath, string.Empty);
             string test = uri.AbsoluteUri + "OperatorHub";
@@ -122,7 +123,13 @@ namespace AForge.Wpf
                 await Task.Delay(5000);
                 if (webcamImage != null)
                 {
-                    var testresult = await client.GetEventFromSubsystemAsync(13, 0, "CaptureWebcam", ImageToBase64(webcamImage));
+                    var img = new Media
+                    {
+                        Type = "png",
+                        Data = ImageToByte(webcamImage)
+                    };
+                    var frameImage = await client.CreateMedia(img);
+                    var testresult = await client.GetEventFromSubsystemAsync(1, 0, accountUser, "CaptureWebcam", frameImage.Id.ToString());
                     Console.WriteLine(testresult);
                 }
             }
