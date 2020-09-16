@@ -4,24 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Login" Height="790" Width="440" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Title="Login" Height="500" Width="440" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{materialDesign:MaterialDesignFont}" 
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         WindowStyle="None">
-    <Grid x:Name="Main">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120*"/>
-            <ColumnDefinition Width="77*"/>
-        </Grid.ColumnDefinitions>
+    <StackPanel x:Name="Main" Margin="50,150,50,50">
         <!--<Image Source="/SmartControlRoomDesktop;component/UI/LoginBG.jpg" Grid.ColumnSpan="2"/>-->
         <!--<TextBox x:Name="IPAddress" Text="https://localhost:5001" materialDesign:HintAssist.Hint="Server" HorizontalAlignment="Left" Height="37" Margin="70,366,0,0" Padding="19,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Grid.ColumnSpan="2" FontSize="14" BorderThickness="0"/>-->
-        <TextBox x:Name="IPAddress" Text="https://bacom.dyndns.org:5001" materialDesign:HintAssist.Hint="Server" HorizontalAlignment="Left" Height="37" Margin="70,366,0,0" Padding="19,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Grid.ColumnSpan="2" FontSize="14" BorderThickness="0"/>
-        <TextBox x:Name="UserName" Text="OpratorTest001" materialDesign:HintAssist.Hint="Username" HorizontalAlignment="Left" Height="37" Margin="70,417,0,0"  Padding="19,0,0,0"  TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Grid.ColumnSpan="2" FontSize="14"/>
-        <PasswordBox x:Name="Password" Password="test" materialDesign:HintAssist.Hint="Password" HorizontalAlignment="Left" VerticalContentAlignment="Top" Margin="70,467,0,284" Padding="19,0,0,0" Width="300" Grid.ColumnSpan="2" FontSize="14"/>
-        <Button Content="Log In" Style="{StaticResource MaterialDesignRaisedAccentButton}" HorizontalAlignment="Left" Margin="70,580,0,0" VerticalAlignment="Top" Width="300" Height="44" Click="OnLoginClickAsync" Grid.ColumnSpan="2"/>
-        <Button Content="Exit" Style="{StaticResource MaterialDesignFlatAccentBgButton}" Height="44" Margin="129,645,129,101" Click="ButtonExit_Click" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="IPAddress" Text="https://bacom.dyndns.org:5001" materialDesign:HintAssist.Hint="Server" HorizontalAlignment="Center" Height="37" TextWrapping="Wrap" Width="300" FontSize="14"/>
+        <TextBox x:Name="UserName" Text="OpratorTest001" materialDesign:HintAssist.Hint="Username" HorizontalAlignment="Center" Height="37" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" FontSize="14"/>
+        <PasswordBox x:Name="Password" Password="test" materialDesign:HintAssist.Hint="Password" HorizontalAlignment="Center" VerticalContentAlignment="Top" Width="300" Height="37" Grid.ColumnSpan="2" FontSize="14"/>
+        <Button Content="Log In" Style="{StaticResource MaterialDesignRaisedAccentButton}" Margin="20,60,20,20" HorizontalAlignment="Center" VerticalAlignment="Top" Width="250" Height="44" Click="OnLoginClickAsync"/>
+        <Button Content="Exit" Style="{StaticResource MaterialDesignFlatAccentBgButton}" Width="100" Margin="10" Height="44" Click="ButtonExit_Click"/>
         <!--<Image Source="/SmartControlRoomDesktop;component/Images/Icon.png" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="205" Margin="101,30,0,0" VerticalAlignment="Top" Width="205"/>-->
-    </Grid>
+    </StackPanel>
 </Window>
