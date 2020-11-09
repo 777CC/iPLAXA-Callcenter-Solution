@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Device.Location;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -46,6 +47,8 @@ namespace AForge.Wpf
 
         BitmapImage webcamImage = null;
         int accountUser = 0;
+        DesktopClient client;
+        private GeoCoordinateWatcher Watcher;
         public MainWindow()
         {
             InitializeComponent();
@@ -104,7 +107,7 @@ namespace AForge.Wpf
             await connection.StartAsync();
             Console.WriteLine(connection.State);
 
-            DesktopClient client = new DesktopClient(connection);
+            client = new DesktopClient(connection);
             var list = await client.GetEventTypeList();
             //EventLog log = new EventLog
             //{
@@ -117,6 +120,10 @@ namespace AForge.Wpf
             //}
 
             //Console.WriteLine(JsonConvert.SerializeObject(log));
+
+            Watcher = new GeoCoordinateWatcher();
+            Watcher.StatusChanged += Watcher_StatusChanged;
+			Watcher.Start();
 
             while (true)
             {
@@ -131,6 +138,23 @@ namespace AForge.Wpf
                     var frameImage = await client.CreateMedia(img);
                     var testresult = await client.GetEventFromSubsystemAsync(1, 0, accountUser, "CaptureWebcam", frameImage.Id.ToString());
                     Console.WriteLine(testresult);
+                }
+            }
+        }
+
+        private void Watcher_StatusChanged(object sender, GeoPositionStatusChangedEventArgs e)
+        {
+            if (e.Status == GeoPositionStatus.Ready)
+            {
+                if (Watcher.Position.Location.IsUnknown)
+                {
+                    Console.Write("Cannot find location");
+                }
+                else
+                {
+                    //Console.WriteLine("Lat: " + Watcher.Position.Location.Latitude.ToString());
+                    //Console.WriteLine("Lon: " + Watcher.Position.Location.Longitude.ToString());
+                    client.UpdateAccountLatLong(accountUser, Convert.ToSingle(Watcher.Position.Location.Latitude), Convert.ToSingle(Watcher.Position.Location.Longitude));
                 }
             }
         }
