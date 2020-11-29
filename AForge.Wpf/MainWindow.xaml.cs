@@ -127,7 +127,7 @@ namespace AForge.Wpf
 
             while (true)
             {
-                await Task.Delay(5000);
+                await Task.Delay(100);
                 if (webcamImage != null)
                 {
                     var img = new Media

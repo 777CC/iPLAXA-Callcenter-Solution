@@ -109,7 +109,7 @@ namespace TestBatchWebcam
             Random random = new Random();
             while (true)
             {
-                await Task.Delay(3000);
+                await Task.Delay(1000);
                 AddMedia(idIndex, imageList[random.Next(imageList.Count)]);
                 idIndex++;
                 if(idIndex == 22)
